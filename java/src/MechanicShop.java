@@ -212,10 +212,10 @@ public class MechanicShop{
 	 * @param args the command line arguments this inclues the <mysql|pgsql> <login file>
 	 */
 	public static void main (String[] args) {
-		if (args.length != 3) {
+		if (args.length != 4) {
 			System.err.println (
 				"Usage: " + "java [-classpath <classpath>] " + MechanicShop.class.getName () +
-		            " <dbname> <port> <user>");
+		            " <dbname> <port> <user> <password>");
 			return;
 		}//end if
 		
@@ -237,8 +237,9 @@ public class MechanicShop{
 			String dbname = args[0];
 			String dbport = args[1];
 			String user = args[2];
+			String password = args[3];
 			
-			esql = new MechanicShop (dbname, dbport, user, "");
+			esql = new MechanicShop (dbname, dbport, user, password);
 			
 			boolean keepon = true;
 			while(keepon){
