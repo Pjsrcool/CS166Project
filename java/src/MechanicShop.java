@@ -306,7 +306,30 @@ public class MechanicShop{
 	}//end readChoice
 	
 	public static void AddCustomer(MechanicShop esql){//1
-		
+		Integer id;
+		String fname, lname, phone, address;
+		Statement query;
+
+		try{
+			System.out.print("Enter unique customer ID: ");
+			id =  Integer.parseInt(in.readLine());
+			System.out.print("Enter customer first name: ");
+			fname = in.readLine();
+			System.out.print("Enter customer last name: " );
+			lname = in.readLine();
+			System.out.print("Enter customer phone number: ");
+			phone = in.readLine();
+			System.out.print("Enter customer address: ");
+			address = in.readLine();
+
+			query = esql._connection.createStatement();
+			esql.executeUpdate("INSERT INTO Customer VALUES (" + id + ", '" + fname + "', '" + lname + "', '" + phone + "', '" + address  + "')");
+
+			System.out.println("Customer " + fname + " " + lname + " has been added.\n");
+
+		} catch (Exception e) {
+			System.out.println("ERROR: Failed to insert customer data. Make sure the customer information is entered correctly.\n");
+		}
 	}
 	
 	public static void AddMechanic(MechanicShop esql){//2
