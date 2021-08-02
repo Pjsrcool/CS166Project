@@ -17,6 +17,7 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Date;
 import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
@@ -323,12 +324,14 @@ public class MechanicShop{
 			address = in.readLine();
 
 			query = esql._connection.createStatement();
-			esql.executeUpdate("INSERT INTO Customer VALUES (" + id + ", '" + fname + "', '" + lname + "', '" + phone + "', '" + address  + "')");
+			esql.executeUpdate("INSERT INTO Customer VALUES (" + id + ", '" + fname + "', '" 
+										+ lname + "', '" + phone + "', '" + address  + "')");
 
 			System.out.println("Customer " + fname + " " + lname + " has been added.\n");
 
 		} catch (Exception e) {
-			System.out.println("ERROR: Failed to insert customer data. Make sure the customer information is entered correctly.\n");
+			System.out.println("ERROR: Failed to insert customer data. " +
+							   "Make sure the customer information is entered correctly.\n");
 		}
 	}
 	
@@ -341,7 +344,35 @@ public class MechanicShop{
 	}
 	
 	public static void InsertServiceRequest(MechanicShop esql){//4
-		
+		Integer rid, customer_id, odometer;
+		String car_vin, complain;
+		Date date;
+		Statement query;
+
+		try {
+			System.out.print("Enter rid: ");
+			rid = Integer.parseInt(in.readLine());
+			System.out.print("Enter customer ID: ");
+			customer_id = Integer.parseInt(in.readLine());
+			System.out.print("Enter car vin: ");
+			car_vin = in.readLine();
+			System.out.print("Enter date using numbers in the format year-month-day: ");
+			date = Date.valueOf(in.readLine());
+			System.out.print("Enter odometer value: ");
+			odometer = Integer.parseInt(in.readLine());
+			System.out.print("Enter the complaint: ");
+			complain = in.readLine();
+
+			query = esql._connection.createStatement();
+			esql.executeUpdate("INSERT INTO Service_Request VALUES ('" + rid + "', '" + customer_id + 
+							   "', '" + car_vin + "', '" + date + "', '" + odometer + "', '" + complain + "');");
+
+			System.out.println("New Service Request created sucessfully!\n");
+		} catch (IllegalArgumentException e) {
+			System.out.println("ERROR: Date is entered incorrectly.\n");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		} 
 	}
 	
 	public static void CloseServiceRequest(MechanicShop esql) throws Exception{//5
