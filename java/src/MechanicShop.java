@@ -309,7 +309,6 @@ public class MechanicShop{
 	public static void AddCustomer(MechanicShop esql){//1
 		Integer id;
 		String fname, lname, phone, address;
-		Statement query;
 
 		try{
 			System.out.print("Enter unique customer ID: ");
@@ -323,7 +322,6 @@ public class MechanicShop{
 			System.out.print("Enter customer address: ");
 			address = in.readLine();
 
-			query = esql._connection.createStatement();
 			esql.executeUpdate("INSERT INTO Customer VALUES (" + id + ", '" + fname + "', '" 
 										+ lname + "', '" + phone + "', '" + address  + "')");
 
@@ -347,7 +345,6 @@ public class MechanicShop{
 		Integer rid, customer_id, odometer;
 		String car_vin, complain;
 		Date date;
-		Statement query;
 
 		try {
 			System.out.print("Enter rid: ");
@@ -363,7 +360,6 @@ public class MechanicShop{
 			System.out.print("Enter the complaint: ");
 			complain = in.readLine();
 
-			query = esql._connection.createStatement();
 			esql.executeUpdate("INSERT INTO Service_Request VALUES ('" + rid + "', '" + customer_id + 
 							   "', '" + car_vin + "', '" + date + "', '" + odometer + "', '" + complain + "');");
 
