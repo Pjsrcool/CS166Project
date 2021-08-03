@@ -17,6 +17,7 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Date;
 import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
@@ -306,11 +307,106 @@ public class MechanicShop{
 	}//end readChoice
 	
 	public static void AddCustomer(MechanicShop esql){//1
+		Integer id;
+		String fname, lname, phone, address;
+
+		try{
+			// create new customer id
+			Statement S = esql._connection.createStatement();
+			ResultSet rs = S.executeQuery("SELECT MAX(id) FROM Customer;");
+			rs.next();
+			id =  rs.getInt("max") + 1;
+
+			// now we ask for customer information
+			System.out.print("Enter customer first name (32 charactes max): ");
+			fname = in.readLine();
+			if (fname.length() > 32) {
+				System.out.println("ERROR: First name must be 32 characters or less!\n");
+				return;
+			}
+
+			System.out.print("Enter customer last name (32 characters max): " );
+			lname = in.readLine();
+			if (lname.length() > 32) {
+				System.out.println("ERROR: Last name must be 32 characters or less!\n");
+				return;
+			}
+
+			System.out.print("Enter customer phone number using integers only: ");
+			phone = in.readLine();
+			if (phone.length() > 13) {
+				System.out.println("ERROR: Phone numbers can only be 13 digits or less!\n");
+				return;
+			}
+
+			System.out.print("Enter customer address (256 characters max): ");
+			address = in.readLine();
+			if (address.length() > 256) {
+				System.out.println("ERROR: Complain description can only be 256 characters or less!\n");
+				return;
+			}
 		
+			// execute insertion into table
+			esql.executeUpdate("INSERT INTO Customer VALUES (" + id + ", '" + fname + "', '" 
+										+ lname + "', '" + phone + "', '" + address  + "')");
+
+			System.out.println("Customer " + fname + " " + lname + " has been added with id " +
+								id + ".\n");
+
+		} catch (Exception e) {
+			System.out.println("ERROR: Failed to insert customer data. " +
+							   "Make sure the customer information is entered correctly.\n");
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	public static void AddMechanic(MechanicShop esql){//2
-		
+		Integer id, experience;
+		String fname, lname, temp;
+
+		try{
+			// create new customer id
+			Statement S = esql._connection.createStatement();
+			ResultSet rs = S.executeQuery("SELECT MAX(id) FROM Mechanic;");
+			rs.next();
+			id =  rs.getInt("max") + 1;
+
+			// now we ask for customer information
+			System.out.print("Enter mechanic first name (32 charactes max): ");
+			fname = in.readLine();
+			if (fname.length() > 32) {
+				System.out.println("ERROR: First name must be 32 characters or less!\n");
+				return;
+			}
+
+			System.out.print("Enter mechanic last name (32 characters max): " );
+			lname = in.readLine();
+			if (lname.length() > 32) {
+				System.out.println("ERROR: Last name must be 32 characters or less!\n");
+				return;
+			}
+
+			System.out.print("Enter mechanic years of experience using integers only: ");
+			temp = in.readLine();
+			if (temp.length() > 2) {
+				System.out.println("ERROR: max years of experience is 99!\n");
+				return;
+			}
+
+			experience = Integer.parseInt(temp);
+
+			// execute insertion into table
+			esql.executeUpdate("INSERT INTO Mechanic VALUES (" + id + ", '" + fname + "', '" 
+										+ lname + "', '" + experience + "')");
+
+			System.out.println("Mechanic " + fname + " " + lname + " has been added with id " +
+								id + ".\n");
+
+		} catch (Exception e) {
+			System.out.println("ERROR: Failed to insert mechanic data. " +
+							   "Make sure the customer information is entered correctly.\n");
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	public static void AddCar(MechanicShop esql){//3
@@ -318,7 +414,37 @@ public class MechanicShop{
 	}
 	
 	public static void InsertServiceRequest(MechanicShop esql){//4
-		
+		Integer rid, customer_id, odometer;
+		String car_vin, complain;
+		Date date;
+
+		try {
+			System.out.print("Enter rid (integer only): ");
+			rid = Integer.parseInt(in.readLine());
+			System.out.print("Enter customer ID: ");
+			customer_id = Integer.parseInt(in.readLine());
+			System.out.print("Enter car vin: ");
+			car_vin = in.readLine();
+			System.out.print("Enter date using numbers in the format year-month-day: ");
+			date = Date.valueOf(in.readLine());
+			System.out.print("Enter odometer value (integer only): ");
+			odometer = Integer.parseInt(in.readLine());
+			System.out.print("Enter the complaint: ");
+			complain = in.readLine();
+
+			esql.executeUpdate("INSERT INTO Service_Request VALUES ('" + rid + "', '" + customer_id + 
+							   "', '" + car_vin + "', '" + date + "', '" + odometer + "', '" + complain + "');");
+
+			System.out.println("New Service Request created sucessfully!\n");
+		} catch (NumberFormatException e) {
+			System.out.println("ERROR: Please enter an integer");
+			System.out.println(e.getMessage() + "\n");
+		} catch (IllegalArgumentException e) {
+			System.out.println("ERROR: Date is entered incorrectly.\n");
+		} catch (Exception e) {
+			System.out.println("ERROR: Failed to create Service Request.");
+			System.out.println(e.getMessage());
+		} 
 	}
 	
 	public static void CloseServiceRequest(MechanicShop esql) throws Exception{//5
