@@ -311,25 +311,52 @@ public class MechanicShop{
 		String fname, lname, phone, address;
 
 		try{
-			System.out.print("Enter unique customer ID: ");
-			id =  Integer.parseInt(in.readLine());
-			System.out.print("Enter customer first name: ");
-			fname = in.readLine();
-			System.out.print("Enter customer last name: " );
-			lname = in.readLine();
-			System.out.print("Enter customer phone number: ");
-			phone = in.readLine();
-			System.out.print("Enter customer address: ");
-			address = in.readLine();
+			// create new customer id
+			Statement S = esql._connection.createStatement();
+			ResultSet rs = S.executeQuery("SELECT MAX(id) FROM Customer;");
+			rs.next();
+			id =  rs.getInt("max") + 1;
 
+			// now we ask for customer information
+			System.out.print("Enter customer first name (32 charactes max): ");
+			fname = in.readLine();
+			if (fname.length() > 32) {
+				System.out.println("ERROR: First name must be 32 characters or less!\n");
+				return;
+			}
+
+			System.out.print("Enter customer last name (32 characters max): " );
+			lname = in.readLine();
+			if (lname.length() > 32) {
+				System.out.println("ERROR: Last name must be 32 characters or less!\n");
+				return;
+			}
+
+			System.out.print("Enter customer phone number using integers only: ");
+			phone = in.readLine();
+			if (phone.length() > 13) {
+				System.out.println("ERROR: Phone numbers can only be 13 digits or less!\n");
+				return;
+			}
+
+			System.out.print("Enter customer address (256 characters max): ");
+			address = in.readLine();
+			if (address.length() > 256) {
+				System.out.println("ERROR: Complain description can only be 256 characters or less!\n");
+				return;
+			}
+		
+			// execute insertion into table
 			esql.executeUpdate("INSERT INTO Customer VALUES (" + id + ", '" + fname + "', '" 
 										+ lname + "', '" + phone + "', '" + address  + "')");
 
-			System.out.println("Customer " + fname + " " + lname + " has been added.\n");
+			System.out.println("Customer " + fname + " " + lname + " has been added with id " +
+								id + ".\n");
 
 		} catch (Exception e) {
 			System.out.println("ERROR: Failed to insert customer data. " +
 							   "Make sure the customer information is entered correctly.\n");
+			System.out.println(e.getMessage());
 		}
 	}
 	
@@ -347,7 +374,7 @@ public class MechanicShop{
 		Date date;
 
 		try {
-			System.out.print("Enter rid: ");
+			System.out.print("Enter rid (integer only): ");
 			rid = Integer.parseInt(in.readLine());
 			System.out.print("Enter customer ID: ");
 			customer_id = Integer.parseInt(in.readLine());
@@ -355,7 +382,7 @@ public class MechanicShop{
 			car_vin = in.readLine();
 			System.out.print("Enter date using numbers in the format year-month-day: ");
 			date = Date.valueOf(in.readLine());
-			System.out.print("Enter odometer value: ");
+			System.out.print("Enter odometer value (integer only): ");
 			odometer = Integer.parseInt(in.readLine());
 			System.out.print("Enter the complaint: ");
 			complain = in.readLine();
@@ -364,9 +391,13 @@ public class MechanicShop{
 							   "', '" + car_vin + "', '" + date + "', '" + odometer + "', '" + complain + "');");
 
 			System.out.println("New Service Request created sucessfully!\n");
+		} catch (NumberFormatException e) {
+			System.out.println("ERROR: Please enter an integer");
+			System.out.println(e.getMessage() + "\n");
 		} catch (IllegalArgumentException e) {
 			System.out.println("ERROR: Date is entered incorrectly.\n");
 		} catch (Exception e) {
+			System.out.println("ERROR: Failed to create Service Request.");
 			System.out.println(e.getMessage());
 		} 
 	}
