@@ -370,32 +370,73 @@ public class MechanicShop{
 	
 	public static void InsertServiceRequest(MechanicShop esql){//4
 		Integer rid, customer_id, odometer;
-		String car_vin, complain;
+		String cLname, car_vin, complain;
 		Date date;
 
 		try {
-			System.out.print("Enter rid (integer only): ");
-			rid = Integer.parseInt(in.readLine());
-			System.out.print("Enter customer ID: ");
-			customer_id = Integer.parseInt(in.readLine());
+			Statement S = esql._connection.createStatement();
+			ResultSet rs = S.executeQuery("SELECT MAX(rid) FROM Service_Request;");
+			rs.next();
+			rid = rs.getInt("max");
+
+			System.out.print("Enter customer Last Name: ");
+			cLname = in.readLine();
+
+			List<List<String>> customers = esql.executeQueryAndReturnResult(
+				"SELECT lname FROM Customer WHERE lname = '" + cLname + "';");
+			if (customers.size() == 1) {
+				System.out.println("Is " + customers.get(0).get(1) + " " + customers.get(0).get(2) + " correct? (y/n): ");
+				if (in.readLine().equals("y") || in.readLine().equals("Y")) {
+					customer_id = Integer.parseInt(customers.get(0).get(0));
+					System.out.println("Customer " + customers.get(0).get(1) + " " + customers.get(0).get(2) + 
+									   " with id " + customers.get(0).get(0) + " sucessfully selected.");
+				} else {
+					AddCustomer(esql);
+					rs = S.executeQuery("SELECT fname, lname, MAX(id) FROM Customer WHERE id = MAX(id);");
+					rs.next();
+					customer_id = rs.getInt("max");
+					System.out.println("Customer " + rs.getString("fname") + " " + rs.getString("lname") +
+									   " with id " + customer_id + " sucessfully selected.");
+				}
+			} else if (esql.executeQueryAndPrintResult("SELECT lname FROM Customer WHERE lname = '" + cLname + "';") != 1) {
+				System.out.println("Enter the customer id from the list above (enter 'x' if not found): ");
+				String answer = in.readLine();
+				if (!answer.equals("x") && !answer.equals("X")) {
+					customer_id = Integer.parseInt(answer);
+					List<List<String>> customers2 = esql.executeQueryAndReturnResult(
+						"SELECT id, fname, lname FROM CUSTOMERS WHERE (id = '" + customer_id + "', lname = '" + cLname + "');");
+					System.out.println("Customer " + customers2.get(0).get(1) + " " + customers2.get(0).get(2) + " with id " +
+									   customers2.get(0).get(0) + " sucessfully selected.");
+				} else {
+					AddCustomer(esql);
+					rs = S.executeQuery("SELECT fname, lname, MAX(id) FROM Customer WHERE id = MAX(id);");
+					rs.next();
+					customer_id = rs.getInt("max");
+					System.out.println("Customer " + rs.getString("fname") + " " + rs.getString("lname") +
+									   " with id " + customer_id + " sucessfully selected.");
+				}
+
+			}
+						
 			System.out.print("Enter car vin: ");
 			car_vin = in.readLine();
-			System.out.print("Enter date using numbers in the format year-month-day: ");
-			date = Date.valueOf(in.readLine());
+			
+			date = new Date(System.currentTimeMillis());
+
 			System.out.print("Enter odometer value (integer only): ");
 			odometer = Integer.parseInt(in.readLine());
+
 			System.out.print("Enter the complaint: ");
 			complain = in.readLine();
 
-			esql.executeUpdate("INSERT INTO Service_Request VALUES ('" + rid + "', '" + customer_id + 
-							   "', '" + car_vin + "', '" + date + "', '" + odometer + "', '" + complain + "');");
+			// esql.executeUpdate("INSERT INTO Service_Request VALUES ('" + rid + "', '" + customer_id + 
+							//    "', '" + car_vin + "', '" + date + "', '" + odometer + "', '" + complain + "');");
 
 			System.out.println("New Service Request created sucessfully!\n");
+			S.close();
 		} catch (NumberFormatException e) {
 			System.out.println("ERROR: Please enter an integer");
 			System.out.println(e.getMessage() + "\n");
-		} catch (IllegalArgumentException e) {
-			System.out.println("ERROR: Date is entered incorrectly.\n");
 		} catch (Exception e) {
 			System.out.println("ERROR: Failed to create Service Request.");
 			System.out.println(e.getMessage());
