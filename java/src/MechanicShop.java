@@ -369,7 +369,7 @@ public class MechanicShop{
 		Integer year;
 
 		try {
-			System.out.print("Enter the car's VIN (16 characters and numbers): ");
+			System.out.print("Enter the car's VIN (6 letters followed by 10 integers): ");
 			vin = in.readLine();
 			if (vin.length() != 16) {
 				System.out.println("ERROR: Too many or missing characters or numbers!\n");
@@ -383,7 +383,7 @@ public class MechanicShop{
 				return;
 			}
 
-			System.out.print("Enter model of the car: ");
+			System.out.print("Enter model of the car (32 characters max): ");
 			model = in.readLine();
 			if (model.length() > 32) {
 				System.out.println("ERROR: Too many characters!\n");
