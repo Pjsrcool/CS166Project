@@ -365,7 +365,42 @@ public class MechanicShop{
 	}
 	
 	public static void AddCar(MechanicShop esql){//3
-		
+		String vin, make, model;
+		Integer year;
+
+		try {
+			System.out.print("Enter the car's VIN (16 characters and numbers): ");
+			vin = in.readLine();
+			if (vin.length() != 32) {
+				System.out.println("ERROR: Too many or missing characters or numbers!\n");
+				return;
+			}
+
+			System.out.print("Enter make of the car (32 charactes max): ");
+			make = in.readLine();
+			if (make.length() > 32) {
+				System.out.println("ERROR: Too many characters!\n");
+				return;
+			}
+
+			System.out.print("Enter model of the car: ");
+			model = in.readLine();
+			if (model.length() > 32) {
+				System.out.println("ERROR: Too many characters!\n");
+				return;
+			}
+
+			System.out.println("Enter year of the car: ");
+			String answer = in.readLine();
+			if (answer.length() != 4) {
+				System.out.println("ERROR: Invalid year!\n");
+				return;
+			}
+			year = Integer.parseInt(answer);
+
+			esql.executeUpdate("INSERT INTO Car VALUES ('" + vin + "','" + make + "','" + model + "','" + year + "');");
+			System.out.println("Sucessfully added new " + make + " " + model + "\n");
+		}
 	}
 	
 	public static void InsertServiceRequest(MechanicShop esql){//4
