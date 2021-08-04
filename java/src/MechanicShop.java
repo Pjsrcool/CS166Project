@@ -371,7 +371,7 @@ public class MechanicShop{
 		try {
 			System.out.print("Enter the car's VIN (16 characters and numbers): ");
 			vin = in.readLine();
-			if (vin.length() != 32) {
+			if (vin.length() != 16) {
 				System.out.println("ERROR: Too many or missing characters or numbers!\n");
 				return;
 			}
@@ -390,16 +390,18 @@ public class MechanicShop{
 				return;
 			}
 
-			System.out.println("Enter year of the car: ");
-			String answer = in.readLine();
-			if (answer.length() != 4) {
+			System.out.print("Enter year of the car (>= 1970): ");
+			year = Integer.parseInt(in.readLine());
+			if (year < 1970) {
 				System.out.println("ERROR: Invalid year!\n");
 				return;
 			}
-			year = Integer.parseInt(answer);
 
 			esql.executeUpdate("INSERT INTO Car VALUES ('" + vin + "','" + make + "','" + model + "','" + year + "');");
 			System.out.println("Sucessfully added new " + make + " " + model + "\n");
+		} catch (Exception e) {
+			System.out.println("ERROR: Failed to add new car.");
+			System.out.println(e.getMessage() + "\n");
 		}
 	}
 	
