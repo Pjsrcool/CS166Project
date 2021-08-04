@@ -383,35 +383,40 @@ public class MechanicShop{
 			cLname = in.readLine();
 
 			List<List<String>> customers = esql.executeQueryAndReturnResult(
-				"SELECT lname FROM Customer WHERE lname = '" + cLname + "';");
+				"SELECT id, fname, lname FROM Customer WHERE lname = '" + cLname + "';");
 			if (customers.size() == 1) {
 				System.out.println("Is " + customers.get(0).get(1) + " " + customers.get(0).get(2) + " correct? (y/n): ");
-				if (in.readLine().equals("y") || in.readLine().equals("Y")) {
+				String answer = in.readLine();
+				if (answer.equals("y") || answer.equals("Y")) {
 					customer_id = Integer.parseInt(customers.get(0).get(0));
 					System.out.println("Customer " + customers.get(0).get(1) + " " + customers.get(0).get(2) + 
 									   " with id " + customers.get(0).get(0) + " sucessfully selected.");
 				} else {
 					AddCustomer(esql);
-					rs = S.executeQuery("SELECT fname, lname, MAX(id) FROM Customer WHERE id = MAX(id);");
+					rs = S.executeQuery("SELECT MAX(id) FROM Customer;");
 					rs.next();
 					customer_id = rs.getInt("max");
+					rs = S.executeQuery("SELECT fname, lname FROM Customer WHERE id = '" + customer_id + "';");
+					rs.next();
 					System.out.println("Customer " + rs.getString("fname") + " " + rs.getString("lname") +
 									   " with id " + customer_id + " sucessfully selected.");
 				}
-			} else if (esql.executeQueryAndPrintResult("SELECT lname FROM Customer WHERE lname = '" + cLname + "';") != 1) {
+			} else if (esql.executeQueryAndPrintResult("SELECT id, fname, lname FROM Customer WHERE lname = '" + cLname + "';") != 1) {
 				System.out.println("Enter the customer id from the list above (enter 'x' if not found): ");
 				String answer = in.readLine();
 				if (!answer.equals("x") && !answer.equals("X")) {
 					customer_id = Integer.parseInt(answer);
 					List<List<String>> customers2 = esql.executeQueryAndReturnResult(
-						"SELECT id, fname, lname FROM CUSTOMERS WHERE (id = '" + customer_id + "', lname = '" + cLname + "');");
+						"SELECT id, fname, lname FROM Customer WHERE (id = '" + customer_id + "' AND lname = '" + cLname + "');");
 					System.out.println("Customer " + customers2.get(0).get(1) + " " + customers2.get(0).get(2) + " with id " +
 									   customers2.get(0).get(0) + " sucessfully selected.");
 				} else {
 					AddCustomer(esql);
-					rs = S.executeQuery("SELECT fname, lname, MAX(id) FROM Customer WHERE id = MAX(id);");
+					rs = S.executeQuery("SELECT MAX(id) FROM Customer;");
 					rs.next();
 					customer_id = rs.getInt("max");
+					rs = S.executeQuery("SELECT fname, lname FROM Customer WHERE id = '" + customer_id + "';");
+					rs.next();
 					System.out.println("Customer " + rs.getString("fname") + " " + rs.getString("lname") +
 									   " with id " + customer_id + " sucessfully selected.");
 				}
