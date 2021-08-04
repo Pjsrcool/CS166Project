@@ -365,13 +365,13 @@ public class MechanicShop{
 		String fname, lname, temp;
 
 		try{
-			// create new customer id
+			// create new mechanic id
 			Statement S = esql._connection.createStatement();
 			ResultSet rs = S.executeQuery("SELECT MAX(id) FROM Mechanic;");
 			rs.next();
 			id =  rs.getInt("max") + 1;
 
-			// now we ask for customer information
+			// now we ask for mechanic information
 			System.out.print("Enter mechanic first name (32 charactes max): ");
 			fname = in.readLine();
 			if (fname.length() > 32) {
@@ -404,7 +404,7 @@ public class MechanicShop{
 
 		} catch (Exception e) {
 			System.out.println("ERROR: Failed to insert mechanic data. " +
-							   "Make sure the customer information is entered correctly.\n");
+							   "Make sure the mechanic information is entered correctly.\n");
 			System.out.println(e.getMessage());
 		}
 	}
