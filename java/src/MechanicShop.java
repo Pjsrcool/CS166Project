@@ -535,7 +535,13 @@ public class MechanicShop{
 	}
 	
 	public static void ListCustomersWithBillLessThan100(MechanicShop esql){//6
-		
+		try {
+			String query = "SELECT R.date, R.comment, R.bill FROM Closed_Request R WHERE R.bill < 100";
+			int rowCount = esql.executeQueryAndPrintResult(query);
+			System.out.println("total row(s): " + rowCount);
+			} catch(Exception e) {
+			System.err.println(e.getMessage());
+			}
 	}
 	
 	public static void ListCustomersWithMoreThan20Cars(MechanicShop esql){//7
