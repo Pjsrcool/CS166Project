@@ -361,7 +361,52 @@ public class MechanicShop{
 	}
 	
 	public static void AddMechanic(MechanicShop esql){//2
-		
+		Integer id, experience;
+		String fname, lname, temp;
+
+		try{
+			// create new mechanic id
+			Statement S = esql._connection.createStatement();
+			ResultSet rs = S.executeQuery("SELECT MAX(id) FROM Mechanic;");
+			rs.next();
+			id =  rs.getInt("max") + 1;
+
+			// now we ask for mechanic information
+			System.out.print("Enter mechanic first name (32 charactes max): ");
+			fname = in.readLine();
+			if (fname.length() > 32) {
+				System.out.println("ERROR: First name must be 32 characters or less!\n");
+				return;
+			}
+
+			System.out.print("Enter mechanic last name (32 characters max): " );
+			lname = in.readLine();
+			if (lname.length() > 32) {
+				System.out.println("ERROR: Last name must be 32 characters or less!\n");
+				return;
+			}
+
+			System.out.print("Enter mechanic years of experience using integers only: ");
+			temp = in.readLine();
+			if (temp.length() > 2) {
+				System.out.println("ERROR: max years of experience is 99!\n");
+				return;
+			}
+
+			experience = Integer.parseInt(temp);
+
+			// execute insertion into table
+			esql.executeUpdate("INSERT INTO Mechanic VALUES (" + id + ", '" + fname + "', '" 
+										+ lname + "', '" + experience + "')");
+
+			System.out.println("Mechanic " + fname + " " + lname + " has been added with id " +
+								id + ".\n");
+
+		} catch (Exception e) {
+			System.out.println("ERROR: Failed to insert mechanic data. " +
+							   "Make sure the mechanic information is entered correctly.\n");
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	public static void AddCar(MechanicShop esql){//3
