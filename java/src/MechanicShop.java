@@ -539,13 +539,23 @@ public class MechanicShop{
 			String query = "SELECT R.date, R.comment, R.bill FROM Closed_Request R WHERE R.bill < 100";
 			int rowCount = esql.executeQueryAndPrintResult(query);
 			System.out.println("total row(s): " + rowCount);
-			} catch(Exception e) {
+		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			}
+		} finally {
+			System.out.println();
+		}
 	}
 	
 	public static void ListCustomersWithMoreThan20Cars(MechanicShop esql){//7
-		
+		try {
+			String query = "SELECT C.fname, C.lname, COUNT(O.car_vin) FROM Customer C, Owns O WHERE O.customer_id = C.id GROUP BY C.id HAVING COUNT(O.car_vin) > 20";
+			int rowCount = esql.executeQueryAndPrintResult(query);
+			System.out.println("total row(s): " + rowCount);
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+		} finally {
+			System.out.println();
+		}
 	}
 	
 	public static void ListCarsBefore1995With50000Milles(MechanicShop esql){//8
