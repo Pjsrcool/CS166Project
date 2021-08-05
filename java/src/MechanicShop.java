@@ -540,11 +540,9 @@ public class MechanicShop{
 			int rowCount = esql.executeQueryAndPrintResult(query);
 			System.out.println("total row(s): " + rowCount);
 			} 
-			
 		catch(Exception e) {
 			System.err.println(e.getMessage());
 			}
-
 		finally {
 			System.out.println();
 		}
@@ -556,11 +554,9 @@ public class MechanicShop{
 			int rowCount = esql.executeQueryAndPrintResult(query);
 			System.out.println("total row(s): " + rowCount);
 			} 
-			
 		catch(Exception e) {
 			System.err.println(e.getMessage());
 			}
-
 		finally {
 			System.out.println();
 		}
