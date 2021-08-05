@@ -548,7 +548,7 @@ public class MechanicShop{
 	
 	public static void ListCustomersWithMoreThan20Cars(MechanicShop esql){//7
 		try {
-			String query = "SELECT C.fname, C.lname, COUNT(O.car_vin) FROM Customer C, Owns O WHERE O.customer_id = C.id GROUP BY C.id HAVING COUNT(O.car_vin) > 20";
+			String query = "SELECT C.fname, C.lname, COUNT(O.car_vin) AS number_of_cars FROM Customer C, Owns O WHERE O.customer_id = C.id GROUP BY C.id HAVING COUNT(O.car_vin) > 20";
 			int rowCount = esql.executeQueryAndPrintResult(query);
 			System.out.println("total row(s): " + rowCount);
 		} catch (Exception e) {
@@ -559,7 +559,15 @@ public class MechanicShop{
 	}
 	
 	public static void ListCarsBefore1995With50000Milles(MechanicShop esql){//8
-		
+		try {
+			String query = "SELECT C.make, C.model, C.year FROM Car C, Service_Request S WHERE C.vin = S.car_vin AND S.odometer < 50000 AND C.year < 1995";
+			int rowCount = esql.executeQueryAndPrintResult(query);
+			System.out.println("total row(s): " + rowCount);
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+		} finally {
+			System.out.println();
+		}
 	}
 	
 	public static void ListKCarsWithTheMostServices(MechanicShop esql){//9
