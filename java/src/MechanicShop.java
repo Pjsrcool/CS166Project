@@ -576,8 +576,15 @@ public class MechanicShop{
 	}
 	
 	public static void ListCustomersInDescendingOrderOfTheirTotalBill(MechanicShop esql){//10
-		//
-		
+		try {
+			String query = "SELECT C.id, C.fname, C.lname, SUM(R.bill) AS totalBill FROM Customer C, Closed_Request R, Service_Request S WHERE C.id = S.customer_id AND R.rid = S.rid GROUP BY C.id ORDER BY totalBill DESC";
+			int rowCount = esql.executeQueryAndPrintResult(query);
+			System.out.println("total row(s): " + rowCount);
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+		} finally {
+			System.out.println();
+		}
 	}
 	
 }
