@@ -583,7 +583,6 @@ public class MechanicShop{
 		} finally {
 			System.out.println();
 		}
-		
 	}
 	
 	public static void ListCustomersInDescendingOrderOfTheirTotalBill(MechanicShop esql){//10
