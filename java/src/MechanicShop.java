@@ -459,7 +459,7 @@ public class MechanicShop{
 			Statement S = esql._connection.createStatement();
 			ResultSet rs = S.executeQuery("SELECT MAX(rid) FROM Service_Request;");
 			rs.next();
-			rid = rs.getInt("max");
+			rid = rs.getInt("max") + 1;
 
 			System.out.print("Enter customer Last Name: ");
 			cLname = in.readLine();
@@ -483,7 +483,7 @@ public class MechanicShop{
 					System.out.println("Customer " + rs.getString("fname") + " " + rs.getString("lname") +
 									   " with id " + customer_id + " sucessfully selected.");
 				}
-			} else if (esql.executeQueryAndPrintResult("SELECT id, fname, lname FROM Customer WHERE lname = '" + cLname + "';") != 1) {
+			} else { //if (esql.executeQueryAndPrintResult("SELECT id, fname, lname FROM Customer WHERE lname = '" + cLname + "';") != 1) {
 				System.out.println("Enter the customer id from the list above (enter 'x' if not found): ");
 				String answer = in.readLine();
 				if (!answer.equals("x") && !answer.equals("X")) {
@@ -516,8 +516,8 @@ public class MechanicShop{
 			System.out.print("Enter the complaint: ");
 			complain = in.readLine();
 
-			// esql.executeUpdate("INSERT INTO Service_Request VALUES ('" + rid + "', '" + customer_id + 
-							//    "', '" + car_vin + "', '" + date + "', '" + odometer + "', '" + complain + "');");
+			esql.executeUpdate("INSERT INTO Service_Request VALUES ('" + rid + "', '" + customer_id + 
+							   "', '" + car_vin + "', '" + date + "', '" + odometer + "', '" + complain + "');");
 
 			System.out.println("New Service Request created sucessfully!\n");
 			S.close();
