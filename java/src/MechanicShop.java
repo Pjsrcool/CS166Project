@@ -409,37 +409,34 @@ public class MechanicShop{
 		}
 	}
 	
-	public static void AddCar(MechanicShop esql){//3
-		String vin, make, model;
+	// changed return type void --> String to make InsertServiceRequest significantly easier
+	public static String AddCar(MechanicShop esql){//3
+		String vin = "", make, model;
 		Integer year;
 
 		try {
 			System.out.print("Enter the car's VIN (6 letters followed by 10 integers): ");
 			vin = in.readLine();
 			if (vin.length() != 16) {
-				System.out.println("ERROR: Too many or missing characters or numbers!\n");
-				return;
+				throw new Exception("ERROR: Too many or missing characters or numbers!");
 			}
 
 			System.out.print("Enter make of the car (32 charactes max): ");
 			make = in.readLine();
 			if (make.length() > 32) {
-				System.out.println("ERROR: Too many characters!\n");
-				return;
+				throw new Exception("ERROR: Too many characters!");
 			}
 
 			System.out.print("Enter model of the car (32 characters max): ");
 			model = in.readLine();
 			if (model.length() > 32) {
-				System.out.println("ERROR: Too many characters!\n");
-				return;
+				throw new Exception("ERROR: Too many characters!");
 			}
 
 			System.out.print("Enter year of the car (>= 1970): ");
 			year = Integer.parseInt(in.readLine());
 			if (year < 1970) {
-				System.out.println("ERROR: Invalid year!\n");
-				return;
+				throw new Exception("ERROR: Invalid year!");
 			}
 
 			esql.executeUpdate("INSERT INTO Car VALUES ('" + vin + "','" + make + "','" + model + "','" + year + "');");
@@ -448,6 +445,8 @@ public class MechanicShop{
 			System.out.println("ERROR: Failed to add new car.");
 			System.out.println(e.getMessage() + "\n");
 		}
+
+		return vin;
 	}
 	
 	public static void InsertServiceRequest(MechanicShop esql){//4
@@ -532,9 +531,13 @@ public class MechanicShop{
 				);
 				System.out.print("Enter your car's vin (x if not listed) :");
 				car_vin = in.readLine();
-			} else {	// case where customer is not in the database
 
-			}
+				if (car_vin.equals("x") || car_vin.equals("X")) {	// case where customer car does not exist
+					car_vin = esql.AddCar(esql);
+				}
+			} else {	// case where customer was not in the database
+				car_vin = esql.AddCar(esql);
+			} // finish selecting car
 			
 			// select current date
 			date = new Date(System.currentTimeMillis());
