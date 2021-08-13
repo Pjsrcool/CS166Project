@@ -478,10 +478,11 @@ public class MechanicShop{
 					
 					customerFound = true;
 				} else {	// the 1 customer is the wrong one. we add a new customer
+					System.out.println("Customer does not exist. Fill out customer form below\n");
 					AddCustomer(esql);
 					rs = S.executeQuery("SELECT MAX(id) FROM Customer;");
 					rs.next();
-					customer_id = rs.getInt("max") + 1;
+					customer_id = rs.getInt("max");
 					rs = S.executeQuery("SELECT fname, lname FROM Customer WHERE id = '" + customer_id + "';");
 					rs.next();
 					System.out.println("Customer " + rs.getString("fname") + " " + rs.getString("lname") +
@@ -491,7 +492,7 @@ public class MechanicShop{
 				AddCustomer(esql);
 				rs = S.executeQuery("SELECT MAX(id) FROM Customer;");
 				rs.next();
-				customer_id = rs.getInt("max") + 1;
+				customer_id = rs.getInt("max");
 				rs = S.executeQuery("SELECT fname, lname FROM Customer WHERE id = '" + customer_id + "';");
 				rs.next();
 				System.out.println("Customer " + rs.getString("fname") + " " + rs.getString("lname") +
