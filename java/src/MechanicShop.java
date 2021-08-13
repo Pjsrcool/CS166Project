@@ -462,14 +462,14 @@ public class MechanicShop{
 			rid = rs.getInt("max") + 1;
 
 			// ask for customer name
-			System.out.print("Enter customer Last Name: ");
+			System.out.print("\nEnter customer Last Name: ");
 			cLname = in.readLine();
 
 			// using customer name, we query/add new customer
 			List<List<String>> customers = esql.executeQueryAndReturnResult(
 				"SELECT id, fname, lname FROM Customer WHERE lname = '" + cLname + "';");
 			if (customers.size() == 1) {	// case where only 1 customer was found
-				System.out.println("Is " + customers.get(0).get(1) + " " + customers.get(0).get(2) + " correct? (y/n): ");
+				System.out.print("Is " + customers.get(0).get(1) + " " + customers.get(0).get(2) + " correct? (y/n): ");
 				String answer = in.readLine();
 				if (answer.equals("y") || answer.equals("Y")) { // the 1 customer is the correct one
 					customer_id = Integer.parseInt(customers.get(0).get(0));
@@ -478,7 +478,7 @@ public class MechanicShop{
 					
 					customerFound = true;
 				} else {	// the 1 customer is the wrong one. we add a new customer
-					System.out.println("Customer does not exist. Fill out customer form below\n");
+					System.out.println("Customer does not exist. Fill out customer form below.\n");
 					AddCustomer(esql);
 					rs = S.executeQuery("SELECT MAX(id) FROM Customer;");
 					rs.next();
@@ -489,6 +489,8 @@ public class MechanicShop{
 									   " with id " + customer_id + " sucessfully selected.");
 				}
 			} else if (customers.size() == 0) {		// case where no customers were found. Immediately add customer
+				System.out.println("Customer does not exist. FIll out customer form below.\n");
+
 				AddCustomer(esql);
 				rs = S.executeQuery("SELECT MAX(id) FROM Customer;");
 				rs.next();
@@ -502,7 +504,7 @@ public class MechanicShop{
 				esql.executeQueryAndPrintResult("SELECT id, fname, lname FROM Customer WHERE lname = '" + cLname + "';");
 
 				// user selectst the customer
-				System.out.println("Enter the customer id from the list above (enter 'x' if not found): ");
+				System.out.print("Enter the customer id from the list above (enter 'x' if not found): ");
 				String answer = in.readLine();
 
 				if (!answer.equals("x") && !answer.equals("X")) {	// customer is found
@@ -526,19 +528,26 @@ public class MechanicShop{
 			} // finished selecting customer
 						
 			// select car
-			if (customerFound) {	// case where the customer exists in the database
-				esql.executeQueryAndPrintResult(
-					"SELECT car_vin FROM Owns WHERE customer_id = '" + customer_id + "';"
-				);
+			System.out.println();
+			Integer numResults = esql.executeQueryAndPrintResult(
+				"SELECT car_vin FROM Owns WHERE customer_id = '" + customer_id + "';"
+			);
+			if (customerFound && numResults > 0) {	// case where the customer exists in the database and owns cars
 				System.out.print("Enter your car's vin (x if not listed) :");
 				car_vin = in.readLine();
 
-				if (car_vin.equals("x") || car_vin.equals("X")) {	// case where customer car does not exist
+				if (car_vin.equals("x") || car_vin.equals("X")) {	// case where customer's car does not exist
 					car_vin = esql.AddCar(esql);
-				}
-			} else {	// case where customer was not in the database
+				}	
+			} else {	// case where customer was not in the database or the customer exists but owns no cars
+				System.out.println("This customer owns no cars. Let's add one\n");
 				car_vin = esql.AddCar(esql);
-			} // finish selecting car
+			} 
+			
+			// ensure that car's vin is correctly entered
+			if (car_vin.length() != 16)
+						throw new Exception("ERROR: Make sure the vin is entered correctly.");
+			// finish selecting car
 			
 			// select current date
 			date = new Date(System.currentTimeMillis());
@@ -562,7 +571,7 @@ public class MechanicShop{
 			System.out.println(e.getMessage() + "\n");
 		} catch (Exception e) {
 			System.out.println("ERROR: Failed to create Service Request.");
-			System.out.println(e.getMessage());
+			System.out.println(e.getMessage() + "\n");
 		} 
 	}
 	
