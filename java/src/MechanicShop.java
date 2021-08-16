@@ -274,6 +274,7 @@ public class MechanicShop{
 					case 10: ListCustomersInDescendingOrderOfTheirTotalBill(esql); break;
 					case 11: keepon = false; break;
 				}
+				System.out.println("Returning to main menu...\n");
 			}
 		}catch(Exception e){
 			System.err.println (e.getMessage ());
@@ -350,13 +351,15 @@ public class MechanicShop{
 			esql.executeUpdate("INSERT INTO Customer VALUES (" + id + ", '" + fname + "', '" 
 										+ lname + "', '" + phone + "', '" + address  + "')");
 
-			System.out.println("Customer " + fname + " " + lname + " has been added with id " +
-								id + ".\n");
+			System.out.println("\nCustomer " + fname + " " + lname + " has been added with id " + id + ".\n");
+			esql.executeQueryAndPrintResult("SELECT * FROM Customer WHERE id = " + id + ";");
 
 		} catch (Exception e) {
 			System.out.println("ERROR: Failed to insert customer data. " +
 							   "Make sure the customer information is entered correctly.\n");
 			System.out.println(e.getMessage());
+		} finally {
+			System.out.println();
 		}
 	}
 	
@@ -399,13 +402,15 @@ public class MechanicShop{
 			esql.executeUpdate("INSERT INTO Mechanic VALUES (" + id + ", '" + fname + "', '" 
 										+ lname + "', '" + experience + "')");
 
-			System.out.println("Mechanic " + fname + " " + lname + " has been added with id " +
-								id + ".\n");
+			System.out.println("\nMechanic " + fname + " " + lname + " has been added with id " + id + ".\n");
+			esql.executeQueryAndPrintResult("SELECT * FROM Mechanic WHERE id = " + id + ";");
 
 		} catch (Exception e) {
 			System.out.println("ERROR: Failed to insert mechanic data. " +
 							   "Make sure the mechanic information is entered correctly.\n");
 			System.out.println(e.getMessage());
+		} finally {
+			System.out.println();
 		}
 	}
 	
@@ -440,10 +445,14 @@ public class MechanicShop{
 			}
 
 			esql.executeUpdate("INSERT INTO Car VALUES ('" + vin + "','" + make + "','" + model + "','" + year + "');");
-			System.out.println("Sucessfully added new " + make + " " + model + "\n");
+			System.out.println("\nSucessfully added new " + make + " " + model + "\n");
+			esql.executeQueryAndPrintResult("SELECT * FROM Car WHERE vin = '" + vin + "';");
+
 		} catch (Exception e) {
 			System.out.println("ERROR: Failed to add new car.");
 			System.out.println(e.getMessage() + "\n");
+		} finally {
+			System.out.println();
 		}
 
 		return vin;
@@ -492,6 +501,7 @@ public class MechanicShop{
 				System.out.println("Customer does not exist. FIll out customer form below.\n");
 
 				AddCustomer(esql);
+				rs.close();
 				rs = S.executeQuery("SELECT MAX(id) FROM Customer;");
 				rs.next();
 				customer_id = rs.getInt("max");
@@ -517,6 +527,7 @@ public class MechanicShop{
 					customerFound = true;
 				} else {	// customer is not found
 					AddCustomer(esql);
+					rs.close();
 					rs = S.executeQuery("SELECT MAX(id) FROM Customer;");
 					rs.next();
 					customer_id = rs.getInt("max") + 1;
@@ -526,7 +537,7 @@ public class MechanicShop{
 									   " with id " + customer_id + " sucessfully selected.");
 				}
 			} // finished selecting customer
-						
+					
 			// select car
 			System.out.println();
 			Integer numResults = esql.executeQueryAndPrintResult(
@@ -564,19 +575,112 @@ public class MechanicShop{
 			esql.executeUpdate("INSERT INTO Service_Request VALUES ('" + rid + "', '" + customer_id + 
 							   "', '" + car_vin + "', '" + date + "', '" + odometer + "', '" + complain + "');");
 
-			System.out.println("New Service Request created sucessfully!\n");
-			S.close();
+			System.out.println("\nNew Service Request created sucessfully!\n");
+			esql.executeQueryAndPrintResult("SELECT * FROM Service_Request WHERE rid = " + rid + ";");
+			
 		} catch (NumberFormatException e) {
 			System.out.println("ERROR: Please enter an integer");
 			System.out.println(e.getMessage() + "\n");
 		} catch (Exception e) {
 			System.out.println("ERROR: Failed to create Service Request.");
 			System.out.println(e.getMessage() + "\n");
-		} 
+		} finally {
+			System.out.println();
+		}
 	}
 	
 	public static void CloseServiceRequest(MechanicShop esql) throws Exception{//5
-		
+		Integer wid, rid, mid, bill;
+		Date date;	// closing date
+		String comment;
+
+		Boolean found = false;	// control input loops
+
+		try {
+			Statement s = esql._connection.createStatement();
+			ResultSet rs = s.executeQuery("SELECT MAX(wid) FROM Closed_Request;");
+			rs.next();
+			wid = rs.getInt("max") + 1;	// wid is 1 bigger than current biggest wid
+
+			// input rid
+			System.out.print("Enter rid of the service request: ");
+			rid = Integer.parseInt(in.readLine());
+			while (!found) {
+				List<List<String>> results = esql.executeQueryAndReturnResult(
+					"SELECT rid " +
+					"FROM Service_Request " +
+					"WHERE rid = " + rid + " and NOT EXISTS (" +
+						"SELECT rid " +
+						"FROM Closed_Request " +
+						"WHERE rid = " + rid + ");"
+				);
+				if (results.size() != 1) {
+					System.out.print("Service Request is already closed or does not exist. Try another one: ");
+					rid = Integer.parseInt(in.readLine());
+				} else {
+					List<List<String>> car = esql.executeQueryAndReturnResult("SELECT C.make, C.model, S.complain FROM Car C, Service_Request S WHERE C.vin = S.car_vin and rid = " + rid + ";");
+					System.out.print("Is the vehicle '" + car.get(0).get(0) + " " + car.get(0).get(1) + "' with issue '" + car.get(0).get(2) + "' correct? (Y/N): ");
+					String answer = in.readLine();
+					if (answer.equals("Y") || answer.equals("y")) {
+						found = true;
+						System.out.println("Service Request selected successfully.\n");
+					} else if (answer.equals("N") || answer.equals("n")) {
+						System.out.print("Enter another rid: ");
+						rid = Integer.parseInt(in.readLine());
+					}
+				}
+			} // end input rid
+
+			// input employee
+			found = false;
+			System.out.print("Enter mechanic ID: ");
+			mid = Integer.parseInt(in.readLine());
+			while (!found) {
+				List<List<String>> result = esql.executeQueryAndReturnResult(
+					"SELECT * FROM Mechanic WHERE id = " + mid + ";"
+				);
+
+				if (result.size() != 1) {
+					System.out.print("ERROR: Invalid ID. Try again: ");
+					mid = Integer.parseInt(in.readLine());
+				} else {
+					System.out.print("Is '" + result.get(0).get(1) + " " + result.get(0).get(2) + "' correct? (Y/N): ");
+					String answer = in.readLine();
+					if (answer.equals("Y") || answer.equals("y")) {
+						found = true;
+						System.out.println("Mechanic selected successfully.\n");
+					} else if (answer.equals("N") || answer.equals("n")) {
+						System.out.print("Enter another ID: ");
+						mid = Integer.parseInt(in.readLine());
+					}
+				}
+			} // end input employee
+
+			// select current date
+			date = new Date(System.currentTimeMillis());
+
+			// input comment
+			System.out.print("Enter any comments: ");
+			comment = in.readLine();
+
+			// input bill
+			System.out.print("Enter bill amount rounded to the nearest dollar: ");
+			bill = Integer.parseInt(in.readLine());
+
+			esql.executeUpdate(
+				"INSERT INTO Closed_Request VALUES (" + wid + ", " + rid + ", " + mid + ", '" +
+				date + "', '" + comment + "', " + bill + ");"
+			);
+			System.out.println("\nService Request closed successfully!");
+			esql.executeQueryAndPrintResult("SELECT * FROM Closed_Request WHERE wid = " + wid + ";");
+
+		} catch (NumberFormatException e) {
+			System.out.println("ERROR: Letters were entered where only numbers are allowed.");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		} finally {
+			System.out.println();
+		}
 	}
 	
 	public static void ListCustomersWithBillLessThan100(MechanicShop esql){//6
@@ -611,7 +715,7 @@ public class MechanicShop{
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		} finally {
-			System.out.println();
+			System.out.println("");
 		}
 	}
 	
@@ -626,7 +730,7 @@ public class MechanicShop{
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		} finally {
-			System.out.println();
+			System.out.println("");
 		}
 	}
 	
@@ -638,7 +742,7 @@ public class MechanicShop{
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		} finally {
-			System.out.println();
+			System.out.println("");
 		}
 	}
 	
