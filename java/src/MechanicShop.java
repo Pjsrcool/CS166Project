@@ -576,7 +576,43 @@ public class MechanicShop{
 	}
 	
 	public static void CloseServiceRequest(MechanicShop esql) throws Exception{//5
-		
+		Integer wid, rid, mid;
+		Date date;	// closing date
+		Boolean found = false;	// control input loops
+
+		try {
+			Statement s = esql._connection.createStatement();
+			ResultSet rs = s.executeQuery("SELECT MAX(wid) FROM Closed_Request;");
+			rs.next();
+			wid = rs.getInt("max") + 1;	// wid is 1 bigger than current biggest wid
+
+			// input rid
+			System.out.print("Enter rid of the service request: ");
+			rid = Integer.parseInt(in.readLine());
+			while (!found) {
+				List<List<String>> results = esql.executeQueryAndReturnResult("SELECT rid FROM Service_Request WHERE rid = " + rid + ";");
+				if (results.size() != 1) {
+					System.out.print("Service Request does not exist, try another one: ");
+					rid = Integer.parseInt(in.readLine());
+				} else {
+					List<List<String>> car = esql.executeQueryAndReturnResult("SELECT C.make, C.model, S.complain FROM Car C, S.Service_Request WHERE C.vin = S.car_vin and rid = " + rid + ";");
+					System.out.print("Is " + car.get(0).get(1) + " " + car.get(0).get(1) + " with issue '" + car.get(0).get(2) + "' correct? (Y/N");
+					String answer = in.readLine();
+					if (answer.equals("Y") || answer.equals("y")) {
+						found = true;
+						System.out.println("Service Request selected successfully.\n");
+					} else {
+						System.out.print("Try another one: ");
+						rid = Integer.parseInt(in.readLine());
+					}
+				}
+			} // end input rid
+
+			// input employee
+			System.out.print("Enter mechanic ID: ");
+			mid = Integer.parseInt(in.readLine());
+
+		}
 	}
 	
 	public static void ListCustomersWithBillLessThan100(MechanicShop esql){//6
