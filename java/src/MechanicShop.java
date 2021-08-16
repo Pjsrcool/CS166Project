@@ -590,29 +590,43 @@ public class MechanicShop{
 			System.out.print("Enter rid of the service request: ");
 			rid = Integer.parseInt(in.readLine());
 			while (!found) {
-				List<List<String>> results = esql.executeQueryAndReturnResult("SELECT rid FROM Service_Request WHERE rid = " + rid + ";");
+				List<List<String>> results = esql.executeQueryAndReturnResult(
+					"SELECT S.rid " +
+					"FROM Service_Request S, Closed_Request C " +
+					"WHERE S.rid = " + rid + " and " + rid + " NOT IN (" +
+						"SELECT rid " +
+						"FROM Closed_Request " +
+						"WHERE rid = " + rid + ");"
+				);
 				if (results.size() != 1) {
-					System.out.print("Service Request does not exist, try another one: ");
+					System.out.print("Service Request is already closed or does not exist. Try another one: ");
 					rid = Integer.parseInt(in.readLine());
 				} else {
-					List<List<String>> car = esql.executeQueryAndReturnResult("SELECT C.make, C.model, S.complain FROM Car C, S.Service_Request WHERE C.vin = S.car_vin and rid = " + rid + ";");
-					System.out.print("Is " + car.get(0).get(1) + " " + car.get(0).get(1) + " with issue '" + car.get(0).get(2) + "' correct? (Y/N");
+					List<List<String>> car = esql.executeQueryAndReturnResult("SELECT C.make, C.model, S.complain FROM Car C, Service_Request S WHERE C.vin = S.car_vin and rid = " + rid + ";");
+					System.out.print("Is the vehicle '" + car.get(0).get(0) + " " + car.get(0).get(1) + "' with issue '" + car.get(0).get(2) + "' correct? (Y/N): ");
 					String answer = in.readLine();
 					if (answer.equals("Y") || answer.equals("y")) {
 						found = true;
 						System.out.println("Service Request selected successfully.\n");
-					} else {
+					} else if (answer.equals("N") || answer.equals("n")) {
 						System.out.print("Try another one: ");
 						rid = Integer.parseInt(in.readLine());
-					}
+					} else
+						throw new Exception("Returning to main menu...\n");
 				}
 			} // end input rid
 
 			// input employee
+			found = false;
 			System.out.print("Enter mechanic ID: ");
 			mid = Integer.parseInt(in.readLine());
-
+		
+		} catch (NumberFormatException e) {
+			System.out.println("ERROR: Letters were entered where only numbers are allowed.");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
 		}
+		System.out.println("Returning to main menu...");
 	}
 	
 	public static void ListCustomersWithBillLessThan100(MechanicShop esql){//6
