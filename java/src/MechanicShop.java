@@ -350,14 +350,16 @@ public class MechanicShop{
 			esql.executeUpdate("INSERT INTO Customer VALUES (" + id + ", '" + fname + "', '" 
 										+ lname + "', '" + phone + "', '" + address  + "')");
 
-			System.out.println("Customer " + fname + " " + lname + " has been added with id " +
-								id + ".\n");
+			System.out.println("Customer " + fname + " " + lname + " has been added with id " + id + ".\n");
+			esql.executeQueryAndPrintResult("SELECT * FROM Customer WHERE id = " + id + ";");
 
 		} catch (Exception e) {
 			System.out.println("ERROR: Failed to insert customer data. " +
 							   "Make sure the customer information is entered correctly.\n");
 			System.out.println(e.getMessage());
 		}
+
+		System.out.println("Returning to main memu...\n");
 	}
 	
 	public static void AddMechanic(MechanicShop esql){//2
@@ -399,14 +401,16 @@ public class MechanicShop{
 			esql.executeUpdate("INSERT INTO Mechanic VALUES (" + id + ", '" + fname + "', '" 
 										+ lname + "', '" + experience + "')");
 
-			System.out.println("Mechanic " + fname + " " + lname + " has been added with id " +
-								id + ".\n");
+			System.out.println("Mechanic " + fname + " " + lname + " has been added with id " + id + ".\n");
+			esql.executeQueryAndPrintResult("SELECT * FROM Mechanic WHERE id = " + id + ";");
 
 		} catch (Exception e) {
 			System.out.println("ERROR: Failed to insert mechanic data. " +
 							   "Make sure the mechanic information is entered correctly.\n");
 			System.out.println(e.getMessage());
 		}
+
+		System.out.println("Returning to main memu...\n");
 	}
 	
 	// changed return type void --> String to make InsertServiceRequest significantly easier
@@ -441,11 +445,14 @@ public class MechanicShop{
 
 			esql.executeUpdate("INSERT INTO Car VALUES ('" + vin + "','" + make + "','" + model + "','" + year + "');");
 			System.out.println("Sucessfully added new " + make + " " + model + "\n");
+			esql.executeQueryAndPrintResult("SELECT * FROM Car WHERE vin = '" + vin + "';");
+
 		} catch (Exception e) {
 			System.out.println("ERROR: Failed to add new car.");
 			System.out.println(e.getMessage() + "\n");
 		}
 
+		System.out.println("Returning to main memu...\n");
 		return vin;
 	}
 	
@@ -637,7 +644,7 @@ public class MechanicShop{
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		} finally {
-			System.out.println();
+			System.out.println("\nReturning to main menu...\n");
 		}
 	}
 	
@@ -649,7 +656,7 @@ public class MechanicShop{
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		} finally {
-			System.out.println();
+			System.out.println("\nReturning to main menu...\n");
 		}
 	}
 	
@@ -661,7 +668,7 @@ public class MechanicShop{
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		} finally {
-			System.out.println();
+			System.out.println("\nReturning to main menu...\n");
 		}
 	}
 	
@@ -676,7 +683,7 @@ public class MechanicShop{
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		} finally {
-			System.out.println();
+			System.out.println("\nReturning to main menu...\n");
 		}
 	}
 	
@@ -688,7 +695,7 @@ public class MechanicShop{
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		} finally {
-			System.out.println();
+			System.out.println("\nReturning to main menu...\n");
 		}
 	}
 	
