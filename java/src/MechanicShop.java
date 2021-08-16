@@ -499,6 +499,7 @@ public class MechanicShop{
 				System.out.println("Customer does not exist. FIll out customer form below.\n");
 
 				AddCustomer(esql);
+				rs.close();
 				rs = S.executeQuery("SELECT MAX(id) FROM Customer;");
 				rs.next();
 				customer_id = rs.getInt("max");
@@ -524,6 +525,7 @@ public class MechanicShop{
 					customerFound = true;
 				} else {	// customer is not found
 					AddCustomer(esql);
+					rs.close();
 					rs = S.executeQuery("SELECT MAX(id) FROM Customer;");
 					rs.next();
 					customer_id = rs.getInt("max") + 1;
@@ -533,7 +535,7 @@ public class MechanicShop{
 									   " with id " + customer_id + " sucessfully selected.");
 				}
 			} // finished selecting customer
-						
+					
 			// select car
 			System.out.println();
 			Integer numResults = esql.executeQueryAndPrintResult(
@@ -572,14 +574,17 @@ public class MechanicShop{
 							   "', '" + car_vin + "', '" + date + "', '" + odometer + "', '" + complain + "');");
 
 			System.out.println("New Service Request created sucessfully!\n");
-			S.close();
+			esql.executeQueryAndPrintResult("SELECT * FROM Service_Request WHERE rid = " + rid + ";");
+			
 		} catch (NumberFormatException e) {
 			System.out.println("ERROR: Please enter an integer");
 			System.out.println(e.getMessage() + "\n");
 		} catch (Exception e) {
 			System.out.println("ERROR: Failed to create Service Request.");
 			System.out.println(e.getMessage() + "\n");
-		} 
+		}
+
+		System.out.println("\nReturning to main menu...\n");
 	}
 	
 	public static void CloseServiceRequest(MechanicShop esql) throws Exception{//5
@@ -672,7 +677,7 @@ public class MechanicShop{
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
-		System.out.println("Returning to main menu...\n");
+		System.out.println("\nReturning to main menu...\n");
 	}
 	
 	public static void ListCustomersWithBillLessThan100(MechanicShop esql){//6
