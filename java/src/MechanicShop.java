@@ -416,10 +416,82 @@ public class MechanicShop{
 	
 	// changed return type void --> String to make InsertServiceRequest significantly easier
 	public static String AddCar(MechanicShop esql){//3
-		String vin = "", make, model;
-		Integer year;
+		String vin = "", make, model, cLname;
+		Integer year, customer_id, oid;
+		Boolean customerFound = false;
 
 		try {
+			// ask for customer name
+			Statement S = esql._connection.createStatement();
+			ResultSet rs = S.executeQuery("SELECT MAX(rid) FROM Service_Request;");
+			rs.next();
+			System.out.print("\nEnter customer Last Name: ");
+			cLname = in.readLine();
+
+			// using customer name, we query/add new customer
+			List<List<String>> customers = esql.executeQueryAndReturnResult(
+				"SELECT id, fname, lname FROM Customer WHERE lname = '" + cLname + "';");
+			if (customers.size() == 1) {	// case where only 1 customer was found
+				System.out.print("Is " + customers.get(0).get(1) + " " + customers.get(0).get(2) + " correct? (y/n): ");
+				String answer = in.readLine();
+				if (answer.equals("y") || answer.equals("Y")) { // the 1 customer is the correct one
+					customer_id = Integer.parseInt(customers.get(0).get(0));
+					System.out.println("Customer " + customers.get(0).get(1) + " " + customers.get(0).get(2) + 
+									   " with id " + customers.get(0).get(0) + " sucessfully selected.");
+					
+					customerFound = true;
+				} else {	// the 1 customer is the wrong one. we add a new customer
+					System.out.println("Customer does not exist. Fill out customer form below.\n");
+					AddCustomer(esql);
+					rs = S.executeQuery("SELECT MAX(id) FROM Customer;");
+					rs.next();
+					customer_id = rs.getInt("max");
+					rs = S.executeQuery("SELECT fname, lname FROM Customer WHERE id = '" + customer_id + "';");
+					rs.next();
+					System.out.println("Customer " + rs.getString("fname") + " " + rs.getString("lname") +
+									   " with id " + customer_id + " sucessfully selected.");
+				}
+			} else if (customers.size() == 0) {		// case where no customers were found. Immediately add customer
+				System.out.println("Customer does not exist. FIll out customer form below.\n");
+
+				AddCustomer(esql);
+				rs.close();
+				rs = S.executeQuery("SELECT MAX(id) FROM Customer;");
+				rs.next();
+				customer_id = rs.getInt("max");
+				rs = S.executeQuery("SELECT fname, lname FROM Customer WHERE id = '" + customer_id + "';");
+				rs.next();
+				System.out.println("Customer " + rs.getString("fname") + " " + rs.getString("lname") +
+									" with id " + customer_id + " sucessfully selected.");			
+			} else {	// case where more than 1 customers are found
+				// list out the customers
+				esql.executeQueryAndPrintResult("SELECT id, fname, lname FROM Customer WHERE lname = '" + cLname + "';");
+
+				// user selectst the customer
+				System.out.print("Enter the customer id from the list above (enter 'x' if not found): ");
+				String answer = in.readLine();
+
+				if (!answer.equals("x") && !answer.equals("X")) {	// customer is found
+					customer_id = Integer.parseInt(answer);
+					List<List<String>> customers2 = esql.executeQueryAndReturnResult(
+						"SELECT id, fname, lname FROM Customer WHERE (id = '" + customer_id + "' AND lname = '" + cLname + "');");
+					System.out.println("Customer " + customers2.get(0).get(1) + " " + customers2.get(0).get(2) + " with id " +
+									   customers2.get(0).get(0) + " sucessfully selected.");
+				
+					customerFound = true;
+				} else {	// customer is not found
+					AddCustomer(esql);
+					rs.close();
+					rs = S.executeQuery("SELECT MAX(id) FROM Customer;");
+					rs.next();
+					customer_id = rs.getInt("max") + 1;
+					rs = S.executeQuery("SELECT fname, lname FROM Customer WHERE id = '" + customer_id + "';");
+					rs.next();
+					System.out.println("Customer " + rs.getString("fname") + " " + rs.getString("lname") +
+									   " with id " + customer_id + " sucessfully selected.");
+				}
+			} // finished selecting customer
+
 			System.out.print("Enter the car's VIN (6 letters followed by 10 integers): ");
 			vin = in.readLine();
 			if (vin.length() != 16) {
@@ -446,6 +518,14 @@ public class MechanicShop{
 
 			esql.executeUpdate("INSERT INTO Car VALUES ('" + vin + "','" + make + "','" + model + "','" + year + "');");
 			System.out.println("\nSucessfully added new " + make + " " + model + "\n");
+
+			rs = S.executeQuery("SELECT MAX(ownership_id) FROM Owns;");
+			rs.next();
+			oid = rs.getInt("max") + 1;
+			esql.executeUpdate("INSERT INTO Owns VALUES ('" + oid + "','" + customer_id + "','" + vin + "');");
+			esql.executeQueryAndPrintResult("SELECT * FROM Owns WHERE ownership_id = " + oid + ";");
+			System.out.println();
+
 			esql.executeQueryAndPrintResult("SELECT * FROM Car WHERE vin = '" + vin + "';");
 
 		} catch (Exception e) {
