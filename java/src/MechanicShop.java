@@ -523,6 +523,8 @@ public class MechanicShop{
 			rs.next();
 			oid = rs.getInt("max") + 1;
 			esql.executeUpdate("INSERT INTO Owns VALUES ('" + oid + "','" + customer_id + "','" + vin + "');");
+			esql.executeQueryAndPrintResult("SELECT * FROM Owns WHERE ownership_id = " + oid + ";");
+			System.out.println();
 
 			esql.executeQueryAndPrintResult("SELECT * FROM Car WHERE vin = '" + vin + "';");
 
