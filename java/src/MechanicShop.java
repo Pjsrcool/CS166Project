@@ -583,8 +583,10 @@ public class MechanicShop{
 	}
 	
 	public static void CloseServiceRequest(MechanicShop esql) throws Exception{//5
-		Integer wid, rid, mid;
+		Integer wid, rid, mid, bill;
 		Date date;	// closing date
+		String comment;
+
 		Boolean found = false;	// control input loops
 
 		try {
@@ -598,9 +600,9 @@ public class MechanicShop{
 			rid = Integer.parseInt(in.readLine());
 			while (!found) {
 				List<List<String>> results = esql.executeQueryAndReturnResult(
-					"SELECT S.rid " +
-					"FROM Service_Request S, Closed_Request C " +
-					"WHERE S.rid = " + rid + " and " + rid + " NOT IN (" +
+					"SELECT rid " +
+					"FROM Service_Request " +
+					"WHERE rid = " + rid + " and NOT EXISTS (" +
 						"SELECT rid " +
 						"FROM Closed_Request " +
 						"WHERE rid = " + rid + ");"
@@ -616,10 +618,9 @@ public class MechanicShop{
 						found = true;
 						System.out.println("Service Request selected successfully.\n");
 					} else if (answer.equals("N") || answer.equals("n")) {
-						System.out.print("Try another one: ");
+						System.out.print("Enter another rid: ");
 						rid = Integer.parseInt(in.readLine());
-					} else
-						throw new Exception("Returning to main menu...\n");
+					}
 				}
 			} // end input rid
 
@@ -627,13 +628,51 @@ public class MechanicShop{
 			found = false;
 			System.out.print("Enter mechanic ID: ");
 			mid = Integer.parseInt(in.readLine());
-		
+			while (!found) {
+				List<List<String>> result = esql.executeQueryAndReturnResult(
+					"SELECT * FROM Mechanic WHERE id = " + mid + ";"
+				);
+
+				if (result.size() != 1) {
+					System.out.print("ERROR: Invalid ID. Try again: ");
+					mid = Integer.parseInt(in.readLine());
+				} else {
+					System.out.print("Is '" + result.get(0).get(1) + " " + result.get(0).get(2) + "' correct? (Y/N): ");
+					String answer = in.readLine();
+					if (answer.equals("Y") || answer.equals("y")) {
+						found = true;
+						System.out.println("Mechanic selected successfully.\n");
+					} else if (answer.equals("N") || answer.equals("n")) {
+						System.out.print("Enter another ID: ");
+						mid = Integer.parseInt(in.readLine());
+					}
+				}
+			} // end input employee
+
+			// select current date
+			date = new Date(System.currentTimeMillis());
+
+			// input comment
+			System.out.print("Enter any comments: ");
+			comment = in.readLine();
+
+			// input bill
+			System.out.print("Enter bill amount rounded to the nearest dollar: ");
+			bill = Integer.parseInt(in.readLine());
+
+			esql.executeUpdate(
+				"INSERT INTO Closed_Request VALUES (" + wid + ", " + rid + ", " + mid + ", '" +
+				date + "', '" + comment + "', " + bill + ");"
+			);
+			System.out.println("Service Request closed successfully!");
+			esql.executeQueryAndPrintResult("SELECT * FROM Closed_Request WHERE wid = " + wid + ";");
+
 		} catch (NumberFormatException e) {
 			System.out.println("ERROR: Letters were entered where only numbers are allowed.");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
-		System.out.println("Returning to main menu...");
+		System.out.println("Returning to main menu...\n");
 	}
 	
 	public static void ListCustomersWithBillLessThan100(MechanicShop esql){//6
