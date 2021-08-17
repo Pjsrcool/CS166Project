@@ -418,7 +418,6 @@ public class MechanicShop{
 	public static String AddCar(MechanicShop esql){//3
 		String vin = "", make, model, cLname;
 		Integer year, customer_id, oid;
-		Boolean customerFound = false;
 
 		try {
 			// ask for customer name
@@ -437,9 +436,7 @@ public class MechanicShop{
 				if (answer.equals("y") || answer.equals("Y")) { // the 1 customer is the correct one
 					customer_id = Integer.parseInt(customers.get(0).get(0));
 					System.out.println("Customer " + customers.get(0).get(1) + " " + customers.get(0).get(2) + 
-									   " with id " + customers.get(0).get(0) + " sucessfully selected.");
-					
-					customerFound = true;
+									   " with id " + customers.get(0).get(0) + " sucessfully selected.");	
 				} else {	// the 1 customer is the wrong one. we add a new customer
 					System.out.println("Customer does not exist. Fill out customer form below.\n");
 					AddCustomer(esql);
@@ -477,8 +474,6 @@ public class MechanicShop{
 						"SELECT id, fname, lname FROM Customer WHERE (id = '" + customer_id + "' AND lname = '" + cLname + "');");
 					System.out.println("Customer " + customers2.get(0).get(1) + " " + customers2.get(0).get(2) + " with id " +
 									   customers2.get(0).get(0) + " sucessfully selected.");
-				
-					customerFound = true;
 				} else {	// customer is not found
 					AddCustomer(esql);
 					rs.close();
@@ -492,34 +487,103 @@ public class MechanicShop{
 				}
 			} // finished selecting customer
 
+			// input vin of car
 			System.out.print("Enter the car's VIN (6 letters followed by 10 integers): ");
 			vin = in.readLine();
 			if (vin.length() != 16) {
 				throw new Exception("ERROR: Too many or missing characters or numbers!");
 			}
 
+			// input make of car
 			System.out.print("Enter make of the car (32 charactes max): ");
 			make = in.readLine();
 			if (make.length() > 32) {
 				throw new Exception("ERROR: Too many characters!");
 			}
 
+			// input model of car
 			System.out.print("Enter model of the car (32 characters max): ");
 			model = in.readLine();
 			if (model.length() > 32) {
 				throw new Exception("ERROR: Too many characters!");
 			}
 
+			// input year of car
 			System.out.print("Enter year of the car (>= 1970): ");
 			year = Integer.parseInt(in.readLine());
 			if (year < 1970) {
 				throw new Exception("ERROR: Invalid year!");
 			}
 
+			// insert car into the Car table, then output success msg to the console
 			esql.executeUpdate("INSERT INTO Car VALUES ('" + vin + "','" + make + "','" + model + "','" + year + "');");
 			System.out.println("\nSucessfully added new " + make + " " + model + "\n");
 
+			// assigns owner to the car we just added and insert it into the Owns table
 			rs = S.executeQuery("SELECT MAX(ownership_id) FROM Owns;");
+			rs.next();
+			oid = rs.getInt("max") + 1;
+			esql.executeUpdate("INSERT INTO Owns VALUES ('" + oid + "','" + customer_id + "','" + vin + "');");
+			esql.executeQueryAndPrintResult("SELECT * FROM Owns WHERE ownership_id = " + oid + ";");
+			System.out.println();
+
+			esql.executeQueryAndPrintResult("SELECT * FROM Car WHERE vin = '" + vin + "';");
+
+		} catch (Exception e) {
+			System.out.println("ERROR: Failed to add new car.");
+			System.out.println(e.getMessage() + "\n");
+		} finally {
+			System.out.println();
+		}
+
+		return vin;
+	}
+
+	/** Overload of the AddCar(esql) function
+	*   This handles the case in InsertServiceRequest where customer already exists in the database
+	*	@param Mechanic shop (itself basically), and customer id (owner of the car that is to be added)
+	*	@return vin of the car as a String
+	*/ 
+	public static String AddCar(MechanicShop esql, Integer customer_id){
+		String vin = "", make, model;
+		Integer year, oid;
+
+		try {
+			// input vin 
+			System.out.print("Enter the car's VIN (6 letters followed by 10 integers): ");
+			vin = in.readLine();
+			if (vin.length() != 16) {
+				throw new Exception("ERROR: Too many or missing characters or numbers!");
+			}
+
+			// input make of car
+			System.out.print("Enter make of the car (32 charactes max): ");
+			make = in.readLine();
+			if (make.length() > 32) {
+				throw new Exception("ERROR: Too many characters!");
+			}
+
+			// input model of car
+			System.out.print("Enter model of the car (32 characters max): ");
+			model = in.readLine();
+			if (model.length() > 32) {
+				throw new Exception("ERROR: Too many characters!");
+			}
+
+			// input model year of car
+			System.out.print("Enter year of the car (>= 1970): ");
+			year = Integer.parseInt(in.readLine());
+			if (year < 1970) {
+				throw new Exception("ERROR: Invalid year!");
+			}
+
+			// insert into the Car table and output a success msg to the console
+			esql.executeUpdate("INSERT INTO Car VALUES ('" + vin + "','" + make + "','" + model + "','" + year + "');");
+			System.out.println("\nSucessfully added new " + make + " " + model + "\n");
+
+			// assigns owner to  the car we just added and insert it into the Owns table
+			Statement S = esql._connection.createStatement();
+			ResultSet rs = S.executeQuery("SELECT MAX(ownership_id) FROM Owns;");
 			rs.next();
 			oid = rs.getInt("max") + 1;
 			esql.executeUpdate("INSERT INTO Owns VALUES ('" + oid + "','" + customer_id + "','" + vin + "');");
@@ -545,6 +609,7 @@ public class MechanicShop{
 		Boolean customerFound = false;
 
 		try {
+			// create a unique rid
 			Statement S = esql._connection.createStatement();
 			ResultSet rs = S.executeQuery("SELECT MAX(rid) FROM Service_Request;");
 			rs.next();
@@ -624,15 +689,15 @@ public class MechanicShop{
 				"SELECT car_vin FROM Owns WHERE customer_id = '" + customer_id + "';"
 			);
 			if (customerFound && numResults > 0) {	// case where the customer exists in the database and owns cars
-				System.out.print("Enter your car's vin (x if not listed) :");
+				System.out.print("Enter your car's vin from the list above (x if not listed) :");
 				car_vin = in.readLine();
 
 				if (car_vin.equals("x") || car_vin.equals("X")) {	// case where customer's car does not exist
-					car_vin = esql.AddCar(esql);
+					car_vin = esql.AddCar(esql, customer_id);
 				}	
 			} else {	// case where customer was not in the database or the customer exists but owns no cars
 				System.out.println("This customer owns no cars. Let's add one\n");
-				car_vin = esql.AddCar(esql);
+				car_vin = esql.AddCar(esql, customer_id);
 			} 
 			
 			// ensure that car's vin is correctly entered
@@ -651,7 +716,7 @@ public class MechanicShop{
 			System.out.print("Enter the complaint: ");
 			complain = in.readLine();
 
-			// insert service request into database
+			// insert service request into database, then we output a sucess msg to the console
 			esql.executeUpdate("INSERT INTO Service_Request VALUES ('" + rid + "', '" + customer_id + 
 							   "', '" + car_vin + "', '" + date + "', '" + odometer + "', '" + complain + "');");
 
