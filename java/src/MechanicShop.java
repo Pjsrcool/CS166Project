@@ -262,16 +262,16 @@ public class MechanicShop{
 				 * FOLLOW THE SPECIFICATION IN THE PROJECT DESCRIPTION
 				 */
 				switch (readChoice()){
-					case 1: AddCustomer(esql); break;
-					case 2: AddMechanic(esql); break;
-					case 3: AddCar(esql); break;
-					case 4: InsertServiceRequest(esql); break;
-					case 5: CloseServiceRequest(esql); break;
-					case 6: ListCustomersWithBillLessThan100(esql); break;
-					case 7: ListCustomersWithMoreThan20Cars(esql); break;
-					case 8: ListCarsBefore1995With50000Milles(esql); break;
-					case 9: ListKCarsWithTheMostServices(esql); break;
-					case 10: ListCustomersInDescendingOrderOfTheirTotalBill(esql); break;
+					case 1: System.out.println(); AddCustomer(esql); break;
+					case 2: System.out.println(); AddMechanic(esql); break;
+					case 3: System.out.println(); AddCar(esql); break;
+					case 4: System.out.println(); InsertServiceRequest(esql); break;
+					case 5: System.out.println(); CloseServiceRequest(esql); break;
+					case 6: System.out.println(); ListCustomersWithBillLessThan100(esql); break;
+					case 7: System.out.println(); ListCustomersWithMoreThan20Cars(esql); break;
+					case 8: System.out.println(); ListCarsBefore1995With50000Milles(esql); break;
+					case 9: System.out.println(); ListKCarsWithTheMostServices(esql); break;
+					case 10: System.out.println(); ListCustomersInDescendingOrderOfTheirTotalBill(esql); break;
 					case 11: keepon = false; break;
 				}
 				System.out.println("Returning to main menu...\n");
@@ -747,8 +747,12 @@ public class MechanicShop{
 			rs.next();
 			wid = rs.getInt("max") + 1;	// wid is 1 bigger than current biggest wid
 
-			// input rid
-			System.out.print("Enter rid of the service request: ");
+			//  Select rid from list of unclosed service requests
+			esql.executeQueryAndPrintResult(
+				"SELECT * FROM Service_Request WHERE rid NOT IN (" +
+					"SELECT rid FROM Closed_Request);"
+			);
+			System.out.print("Enter rid of the service request from list above: ");
 			rid = Integer.parseInt(in.readLine());
 			while (!found) {
 				List<List<String>> results = esql.executeQueryAndReturnResult(
