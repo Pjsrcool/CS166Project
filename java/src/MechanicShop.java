@@ -673,15 +673,15 @@ public class MechanicShop{
 				"SELECT car_vin FROM Owns WHERE customer_id = '" + customer_id + "';"
 			);
 			if (customerFound && numResults > 0) {	// case where the customer exists in the database and owns cars
-				System.out.print("Enter your car's vin (x if not listed) :");
+				System.out.print("Enter your car's vin from the list above (x if not listed) :");
 				car_vin = in.readLine();
 
 				if (car_vin.equals("x") || car_vin.equals("X")) {	// case where customer's car does not exist
-					car_vin = esql.AddCar(esql);
+					car_vin = esql.AddCar(esql, customer_id);
 				}	
 			} else {	// case where customer was not in the database or the customer exists but owns no cars
 				System.out.println("This customer owns no cars. Let's add one\n");
-				car_vin = esql.AddCar(esql);
+				car_vin = esql.AddCar(esql, customer_id);
 			} 
 			
 			// ensure that car's vin is correctly entered
