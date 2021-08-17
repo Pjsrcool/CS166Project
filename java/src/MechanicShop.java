@@ -418,7 +418,6 @@ public class MechanicShop{
 	public static String AddCar(MechanicShop esql){//3
 		String vin = "", make, model, cLname;
 		Integer year, customer_id, oid;
-		Boolean customerFound = false;
 
 		try {
 			// ask for customer name
@@ -437,9 +436,7 @@ public class MechanicShop{
 				if (answer.equals("y") || answer.equals("Y")) { // the 1 customer is the correct one
 					customer_id = Integer.parseInt(customers.get(0).get(0));
 					System.out.println("Customer " + customers.get(0).get(1) + " " + customers.get(0).get(2) + 
-									   " with id " + customers.get(0).get(0) + " sucessfully selected.");
-					
-					customerFound = true;
+									   " with id " + customers.get(0).get(0) + " sucessfully selected.");	
 				} else {	// the 1 customer is the wrong one. we add a new customer
 					System.out.println("Customer does not exist. Fill out customer form below.\n");
 					AddCustomer(esql);
@@ -477,8 +474,6 @@ public class MechanicShop{
 						"SELECT id, fname, lname FROM Customer WHERE (id = '" + customer_id + "' AND lname = '" + cLname + "');");
 					System.out.println("Customer " + customers2.get(0).get(1) + " " + customers2.get(0).get(2) + " with id " +
 									   customers2.get(0).get(0) + " sucessfully selected.");
-				
-					customerFound = true;
 				} else {	// customer is not found
 					AddCustomer(esql);
 					rs.close();
