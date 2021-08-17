@@ -747,8 +747,12 @@ public class MechanicShop{
 			rs.next();
 			wid = rs.getInt("max") + 1;	// wid is 1 bigger than current biggest wid
 
-			// input rid
-			System.out.print("Enter rid of the service request: ");
+			//  Select rid from list of unclosed service requests
+			esql.executeQueryAndPrintResult(
+				"SELECT * FROM Service_Request WHERE rid NOT IN (" +
+					"SELECT rid FROM Closed_Request);"
+			);
+			System.out.print("Enter rid of the service request from list above: ");
 			rid = Integer.parseInt(in.readLine());
 			while (!found) {
 				List<List<String>> results = esql.executeQueryAndReturnResult(
