@@ -487,33 +487,39 @@ public class MechanicShop{
 				}
 			} // finished selecting customer
 
+			// input vin of car
 			System.out.print("Enter the car's VIN (6 letters followed by 10 integers): ");
 			vin = in.readLine();
 			if (vin.length() != 16) {
 				throw new Exception("ERROR: Too many or missing characters or numbers!");
 			}
 
+			// input make of car
 			System.out.print("Enter make of the car (32 charactes max): ");
 			make = in.readLine();
 			if (make.length() > 32) {
 				throw new Exception("ERROR: Too many characters!");
 			}
 
+			// input model of car
 			System.out.print("Enter model of the car (32 characters max): ");
 			model = in.readLine();
 			if (model.length() > 32) {
 				throw new Exception("ERROR: Too many characters!");
 			}
 
+			// input year of car
 			System.out.print("Enter year of the car (>= 1970): ");
 			year = Integer.parseInt(in.readLine());
 			if (year < 1970) {
 				throw new Exception("ERROR: Invalid year!");
 			}
 
+			// insert car into the Car table, then output success msg to the console
 			esql.executeUpdate("INSERT INTO Car VALUES ('" + vin + "','" + make + "','" + model + "','" + year + "');");
 			System.out.println("\nSucessfully added new " + make + " " + model + "\n");
 
+			// assigns owner to the car we just added and insert it into the Owns table
 			rs = S.executeQuery("SELECT MAX(ownership_id) FROM Owns;");
 			rs.next();
 			oid = rs.getInt("max") + 1;
@@ -533,40 +539,49 @@ public class MechanicShop{
 		return vin;
 	}
 
-	// Overload of AddCar
-	// This handles the case in InsertServiceRequest where customer already exists in the database
-	public static String AddCar(MechanicShop esql, Integer customer_id){//3
+	/** Overload of the AddCar(esql) function
+	*   This handles the case in InsertServiceRequest where customer already exists in the database
+	*	@param Mechanic shop (itself basically), and customer id (owner of the car that is to be added)
+	*	@return vin of the car as a String
+	*/ 
+	public static String AddCar(MechanicShop esql, Integer customer_id){
 		String vin = "", make, model;
 		Integer year, oid;
 
 		try {
+			// input vin 
 			System.out.print("Enter the car's VIN (6 letters followed by 10 integers): ");
 			vin = in.readLine();
 			if (vin.length() != 16) {
 				throw new Exception("ERROR: Too many or missing characters or numbers!");
 			}
 
+			// input make of car
 			System.out.print("Enter make of the car (32 charactes max): ");
 			make = in.readLine();
 			if (make.length() > 32) {
 				throw new Exception("ERROR: Too many characters!");
 			}
 
+			// input model of car
 			System.out.print("Enter model of the car (32 characters max): ");
 			model = in.readLine();
 			if (model.length() > 32) {
 				throw new Exception("ERROR: Too many characters!");
 			}
 
+			// input model year of car
 			System.out.print("Enter year of the car (>= 1970): ");
 			year = Integer.parseInt(in.readLine());
 			if (year < 1970) {
 				throw new Exception("ERROR: Invalid year!");
 			}
 
+			// insert into the Car table and output a success msg to the console
 			esql.executeUpdate("INSERT INTO Car VALUES ('" + vin + "','" + make + "','" + model + "','" + year + "');");
 			System.out.println("\nSucessfully added new " + make + " " + model + "\n");
 
+			// assigns owner to  the car we just added and insert it into the Owns table
 			Statement S = esql._connection.createStatement();
 			ResultSet rs = S.executeQuery("SELECT MAX(ownership_id) FROM Owns;");
 			rs.next();
@@ -594,6 +609,7 @@ public class MechanicShop{
 		Boolean customerFound = false;
 
 		try {
+			// create a unique rid
 			Statement S = esql._connection.createStatement();
 			ResultSet rs = S.executeQuery("SELECT MAX(rid) FROM Service_Request;");
 			rs.next();
@@ -700,7 +716,7 @@ public class MechanicShop{
 			System.out.print("Enter the complaint: ");
 			complain = in.readLine();
 
-			// insert service request into database
+			// insert service request into database, then we output a sucess msg to the console
 			esql.executeUpdate("INSERT INTO Service_Request VALUES ('" + rid + "', '" + customer_id + 
 							   "', '" + car_vin + "', '" + date + "', '" + odometer + "', '" + complain + "');");
 
