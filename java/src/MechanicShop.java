@@ -532,6 +532,60 @@ public class MechanicShop{
 
 		return vin;
 	}
+
+	// Overload of AddCar
+	// This handles the case in InsertServiceRequest where customer already exists in the database
+	public static String AddCar(MechanicShop esql, Integer customer_id){//3
+		String vin = "", make, model;
+		Integer year, oid;
+
+		try {
+			System.out.print("Enter the car's VIN (6 letters followed by 10 integers): ");
+			vin = in.readLine();
+			if (vin.length() != 16) {
+				throw new Exception("ERROR: Too many or missing characters or numbers!");
+			}
+
+			System.out.print("Enter make of the car (32 charactes max): ");
+			make = in.readLine();
+			if (make.length() > 32) {
+				throw new Exception("ERROR: Too many characters!");
+			}
+
+			System.out.print("Enter model of the car (32 characters max): ");
+			model = in.readLine();
+			if (model.length() > 32) {
+				throw new Exception("ERROR: Too many characters!");
+			}
+
+			System.out.print("Enter year of the car (>= 1970): ");
+			year = Integer.parseInt(in.readLine());
+			if (year < 1970) {
+				throw new Exception("ERROR: Invalid year!");
+			}
+
+			esql.executeUpdate("INSERT INTO Car VALUES ('" + vin + "','" + make + "','" + model + "','" + year + "');");
+			System.out.println("\nSucessfully added new " + make + " " + model + "\n");
+
+			Statement S = esql._connection.createStatement();
+			ResultSet rs = S.executeQuery("SELECT MAX(ownership_id) FROM Owns;");
+			rs.next();
+			oid = rs.getInt("max") + 1;
+			esql.executeUpdate("INSERT INTO Owns VALUES ('" + oid + "','" + customer_id + "','" + vin + "');");
+			esql.executeQueryAndPrintResult("SELECT * FROM Owns WHERE ownership_id = " + oid + ";");
+			System.out.println();
+
+			esql.executeQueryAndPrintResult("SELECT * FROM Car WHERE vin = '" + vin + "';");
+
+		} catch (Exception e) {
+			System.out.println("ERROR: Failed to add new car.");
+			System.out.println(e.getMessage() + "\n");
+		} finally {
+			System.out.println();
+		}
+
+		return vin;
+	}
 	
 	public static void InsertServiceRequest(MechanicShop esql){//4
 		Integer rid, customer_id, odometer;
