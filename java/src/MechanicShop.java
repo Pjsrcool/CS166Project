@@ -310,7 +310,7 @@ public class MechanicShop{
 	/**
 	 * Method to add a customer into the database.
 	 * 
-	 * @param esql name of the DB
+	 * @param esql name of the DB variable
 	 * @return current value of a sequence
 	 */
 	public static void AddCustomer(MechanicShop esql){//1
@@ -372,6 +372,11 @@ public class MechanicShop{
 		}
 	}
 	
+	/**
+	 * Method to add a mechanic into the database.
+	 * 
+	 * @param esql name of the DB variable
+	 */
 	public static void AddMechanic(MechanicShop esql){//2
 		Integer id, experience;
 		String fname, lname, temp;
@@ -423,7 +428,14 @@ public class MechanicShop{
 		}
 	}
 	
-	// changed return type void --> String to make InsertServiceRequest significantly easier
+	/**
+	 * Method to add a car into the database.
+	 * changed return type void --> String to make InsertServiceRequest significantly easier
+	 * 
+	 * @param sequence name of the DB sequence
+	 * @return the vin of the car just added. if adding a car fails,
+	 * 		   then an empty string is returned instead
+	 */
 	public static String AddCar(MechanicShop esql){//3
 		String vin = "", make, model, cLname;
 		Integer year, customer_id, oid;
@@ -550,6 +562,7 @@ public class MechanicShop{
 
 	/** Overload of the AddCar(esql) function
 	*   This handles the case in InsertServiceRequest where customer already exists in the database
+	*
 	*	@param Mechanic shop (itself basically), and customer id (owner of the car that is to be added)
 	*	@return vin of the car as a String
 	*/ 
