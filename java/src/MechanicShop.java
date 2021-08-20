@@ -307,6 +307,12 @@ public class MechanicShop{
 		return input;
 	}//end readChoice
 	
+	/**
+	 * Method to add a customer into the database.
+	 * 
+	 * @param esql name of the DB
+	 * @return current value of a sequence
+	 */
 	public static void AddCustomer(MechanicShop esql){//1
 		Integer id;
 		String fname, lname, phone, address;
@@ -318,7 +324,7 @@ public class MechanicShop{
 			rs.next();
 			id =  rs.getInt("max") + 1;
 
-			// now we ask for customer information
+			// now we ask for customer first name
 			System.out.print("Enter customer first name (32 charactes max): ");
 			fname = in.readLine();
 			if (fname.length() > 32) {
@@ -326,6 +332,7 @@ public class MechanicShop{
 				return;
 			}
 
+			// ask for customer last name
 			System.out.print("Enter customer last name (32 characters max): " );
 			lname = in.readLine();
 			if (lname.length() > 32) {
@@ -333,6 +340,7 @@ public class MechanicShop{
 				return;
 			}
 
+			// ask for customer phone number
 			System.out.print("Enter customer phone number using integers only: ");
 			phone = in.readLine();
 			if (phone.length() > 13) {
@@ -340,6 +348,7 @@ public class MechanicShop{
 				return;
 			}
 
+			// ask for customer address
 			System.out.print("Enter customer address (256 characters max): ");
 			address = in.readLine();
 			if (address.length() > 256) {
