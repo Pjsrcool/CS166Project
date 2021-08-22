@@ -307,6 +307,12 @@ public class MechanicShop{
 		return input;
 	}//end readChoice
 	
+	/**
+	 * Method to add a customer into the database.
+	 * 
+	 * @param esql name of the DB variable
+	 * @return current value of a sequence
+	 */
 	public static void AddCustomer(MechanicShop esql){//1
 		Integer id;
 		String fname, lname, phone, address;
@@ -318,7 +324,7 @@ public class MechanicShop{
 			rs.next();
 			id =  rs.getInt("max") + 1;
 
-			// now we ask for customer information
+			// now we ask for customer first name
 			System.out.print("Enter customer first name (32 charactes max): ");
 			fname = in.readLine();
 			if (fname.length() > 32) {
@@ -326,6 +332,7 @@ public class MechanicShop{
 				return;
 			}
 
+			// ask for customer last name
 			System.out.print("Enter customer last name (32 characters max): " );
 			lname = in.readLine();
 			if (lname.length() > 32) {
@@ -333,6 +340,7 @@ public class MechanicShop{
 				return;
 			}
 
+			// ask for customer phone number
 			System.out.print("Enter customer phone number using integers only: ");
 			phone = in.readLine();
 			if (phone.length() > 13) {
@@ -340,6 +348,7 @@ public class MechanicShop{
 				return;
 			}
 
+			// ask for customer address
 			System.out.print("Enter customer address (256 characters max): ");
 			address = in.readLine();
 			if (address.length() > 256) {
@@ -363,6 +372,11 @@ public class MechanicShop{
 		}
 	}
 	
+	/**
+	 * Method to add a mechanic into the database.
+	 * 
+	 * @param esql name of the DB variable
+	 */
 	public static void AddMechanic(MechanicShop esql){//2
 		Integer id, experience;
 		String fname, lname, temp;
@@ -414,7 +428,14 @@ public class MechanicShop{
 		}
 	}
 	
-	// changed return type void --> String to make InsertServiceRequest significantly easier
+	/**
+	 * Method to add a car into the database.
+	 * changed return type void --> String to make InsertServiceRequest significantly easier
+	 * 
+	 * @param esql name of the DB
+	 * @return the vin of the car just added. if adding a car fails,
+	 * 		   then an empty string is returned instead
+	 */
 	public static String AddCar(MechanicShop esql){//3
 		String vin = "", make, model, cLname;
 		Integer year, customer_id, oid;
@@ -541,7 +562,9 @@ public class MechanicShop{
 
 	/** Overload of the AddCar(esql) function
 	*   This handles the case in InsertServiceRequest where customer already exists in the database
-	*	@param Mechanic shop (itself basically), and customer id (owner of the car that is to be added)
+	*
+	*	@param esql itself basically, databse variable
+	*	@param customer_id owner of the car that is to be added
 	*	@return vin of the car as a String
 	*/ 
 	public static String AddCar(MechanicShop esql, Integer customer_id){
@@ -602,6 +625,11 @@ public class MechanicShop{
 		return vin;
 	}
 	
+	/**
+	 * Method to add a service request into the database.
+	 * 
+	 * @param esql name of the DB
+	 */
 	public static void InsertServiceRequest(MechanicShop esql){//4
 		Integer rid, customer_id, odometer;
 		String cLname, car_vin, complain;
@@ -733,7 +761,13 @@ public class MechanicShop{
 			System.out.println();
 		}
 	}
-	
+
+	/**
+	 * Method to close a service request by adding a 
+	 * closed_request entry into the database.
+	 * 
+	 * @param esql name of the DB
+	 */
 	public static void CloseServiceRequest(MechanicShop esql) throws Exception{//5
 		Integer wid, rid, mid, bill;
 		Date date;	// closing date
@@ -832,6 +866,12 @@ public class MechanicShop{
 		}
 	}
 	
+	/**
+	 * Method to list the date, comment, and bill for all closed requests
+	 * with a bill lower than 100
+	 * 
+	 * @param esql name of the DB
+	 */
 	public static void ListCustomersWithBillLessThan100(MechanicShop esql){//6
 		try {
 			String query = "SELECT R.date, R.comment, R.bill FROM Closed_Request R WHERE R.bill < 100";
@@ -844,6 +884,12 @@ public class MechanicShop{
 		}
 	}
 	
+	/**
+	 * Method to print the first an last name of customers who have
+	 * more than 20 different cars
+	 * 
+	 * @param esql name of the DB
+	 */
 	public static void ListCustomersWithMoreThan20Cars(MechanicShop esql){//7
 		try {
 			String query = "SELECT C.fname, C.lname, COUNT(O.car_vin) AS number_of_cars FROM Customer C, Owns O WHERE O.customer_id = C.id GROUP BY C.id HAVING COUNT(O.car_vin) > 20";
@@ -856,6 +902,12 @@ public class MechanicShop{
 		}
 	}
 	
+	/**
+	 * Method to print the make, model, and year of all cars built
+	 * before 1995 and has less than 50000 miles
+	 * 
+	 * @param esql name of the DB
+	 */
 	public static void ListCarsBefore1995With50000Milles(MechanicShop esql){//8
 		try {
 			String query = "SELECT C.make, C.model, C.year FROM Car C, Service_Request S WHERE C.vin = S.car_vin AND S.odometer < 50000 AND C.year < 1995";
@@ -868,6 +920,12 @@ public class MechanicShop{
 		}
 	}
 	
+	/**
+	 * Method to List the make, model, and number of service requests for the 
+	 * first k cars with the highest number of service orders 
+	 * 
+	 * @param esql name of the DB
+	 */
 	public static void ListKCarsWithTheMostServices(MechanicShop esql){//9
 		try {
 			String query = "SELECT C.vin, C.make, C.model, COUNT(S.rid) AS numberOfRequests FROM Car C, Service_Request S WHERE C.vin = S.car_vin AND S.rid NOT IN (SELECT R.rid FROM Closed_Request R) GROUP BY C.vin HAVING COUNT(S.rid) < ";
@@ -883,6 +941,12 @@ public class MechanicShop{
 		}
 	}
 	
+	/**
+	 * Method to List the first name, last name, and total bill of customers in 
+	 * descending order of their total bill for all cars brought to the mechanic
+	 * 
+	 * @param esql name of the DB
+	 */
 	public static void ListCustomersInDescendingOrderOfTheirTotalBill(MechanicShop esql){//10
 		try {
 			String query = "SELECT C.id, C.fname, C.lname, SUM(R.bill) AS totalBill FROM Customer C, Closed_Request R, Service_Request S WHERE C.id = S.customer_id AND R.rid = S.rid GROUP BY C.id ORDER BY totalBill DESC";
