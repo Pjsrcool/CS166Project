@@ -928,10 +928,9 @@ public class MechanicShop{
 	 */
 	public static void ListKCarsWithTheMostServices(MechanicShop esql){//9
 		try {
-			String query = "SELECT C.vin, C.make, C.model, COUNT(S.rid) AS numberOfRequests FROM Car C, Service_Request S WHERE C.vin = S.car_vin AND S.rid NOT IN (SELECT R.rid FROM Closed_Request R) GROUP BY C.vin HAVING COUNT(S.rid) < ";
 			System.out.print("\tEnter max amount of service Requests (k>0): ");
 			String k = in.readLine();
-			query += k;
+			String query = "SELECT C.vin, C.make, C.model, COUNT(S.rid) AS numberOfRequests FROM Car C, Service_Request S WHERE C.vin = S.car_vin GROUP BY C.vin ORDER BY numberOfRequests DESC LIMIT " + k;
 			int rowCount = esql.executeQueryAndPrintResult(query);
 			System.out.println("total row(s): " + rowCount);
 		} catch (Exception e) {
